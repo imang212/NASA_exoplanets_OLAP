@@ -59,7 +59,9 @@ print(con.execute("DESCRIBE exoplanets").fetchdf())
 
 #### ERD diagram
 Nejdřív si uděláme ERD diagram, abychom měli přehled o proměnných v tabulce.
-![Untitled](https://github.com/user-attachments/assets/541b854c-744b-47c9-84bc-b29abcfbb388)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/541b854c-744b-47c9-84bc-b29abcfbb388" alt="ERD diagram image"/>
+</p>
 
 Takhle prozatím vypadá má tabulka.
 
