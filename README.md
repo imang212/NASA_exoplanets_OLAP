@@ -341,8 +341,8 @@ print(df)
 ```
 
 Tyto výsledky se dají i uložit do parquet souboru.
-# výsledky si zase můžeme uložit do parquet souboru
 ```python
+# výsledky si zase můžeme uložit do parquet souboru
 makedirs('results', exist_ok=True)
 con.execute("""
     COPY (
@@ -359,3 +359,24 @@ con.execute("""
 """)
 ```
 ### Ukázky grafů a srovnání
+Vytvoření heatmapy na počty planet podle éry objevení a jejich detekce.
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Převod na kontingenční tabulku (pivot)
+pivot = df.pivot(index='detection_method', columns='discovery_era', values='num_planets')
+makedirs('graphs', exist_ok=True)
+
+# Heatmapa
+plt.figure(figsize=(14, 10))
+sns.heatmap(pivot, annot=True, fmt=".0f", cmap="coolwarm")
+plt.title("Počet exoplanet podle éry objevu a metody detekce")
+plt.xlabel("Éra objevu")
+plt.ylabel("Metoda detekce")
+plt.tight_layout()
+plt.savefig('graphs/exoplanet_era_detection_heatmap.png')
+plt.close()
+```
+![exoplanet_era_detection_heatmap](https://github.com/user-attachments/assets/0427abf9-d1ad-4aca-8cef-878f279283bb)
+
