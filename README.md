@@ -257,7 +257,7 @@ con.execute("""
 
 #### Výsledný ERD s dimenzionálními tabulkami
 ![Untitled (1)](https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad)
-
+Vytvořené ERD hvězdicové schéma.
 
 ### Vytvoření Lakehouse storage
 Vytvořené tabulky si uložíme Parquet(Lake) souborů, kde se nám vytvoří soubory pro Lakehouse úložiště. Všechny je uložím do nově vytvořené složky "dimensions".
