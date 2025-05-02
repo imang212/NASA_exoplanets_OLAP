@@ -378,5 +378,5 @@ plt.tight_layout()
 plt.savefig('graphs/exoplanet_era_detection_heatmap.png')
 plt.close()
 ```
-![exoplanet_era_detection_heatmap](https://github.com/user-attachments/assets/0427abf9-d1ad-4aca-8cef-878f279283bb)
+![exoplanet_era_detection_heatmap](https://github.com/user-attachments/assets/26e56bf0-fb6e-4bc4-8fd3-77b3c758c388)
 
