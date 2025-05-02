@@ -283,10 +283,11 @@ con.execute("""
 ```
 
 ### Práce s Lakehouse databází
+Načteme si  tabulky z parquet souborů
 ```python
 import duckdb
 import pandas as pd
-import os
+from os import makedirs
 
 con = duckdb.connect()
 
@@ -301,6 +302,60 @@ con.execute("""
     CREATE VIEW dim_discovery_era AS SELECT * FROM 'dimensions/dim_discovery_era.parquet';
     CREATE VIEW dim_date AS SELECT * FROM 'dimensions/dim_date.parquet';
     CREATE VIEW exoplanets AS SELECT * FROM 'exoplanets.parquet';
+""")
+```
+Select pro zobrazení planet s jejich kategoriemi vzdáleností
+```python
+#zobrazení planet se vzdálenostmi a jejich kategoriemi
+print(con.execute("""
+        SELECT e.name, e.distance, dc.distance_category
+        FROM exoplanets e
+        JOIN dim_distance_category dc ON e.distance_category_id = dc.distance_category_id
+    """).df().head())
+```
+Spočítám si kolik v každé kategorii vzdálenosti je planet.
+```python
+#zobrazení ketegorií a počtu planet v jednotlivých kategoriích
+print(con.execute("""
+        SELECT dc.distance_category as category, count(dc.distance_category) as category_count
+        FROM dim_distance_category as dc
+        GROUP BY dc.distance_category
+        ORDER BY dc.distance_category
+    """).df().head())
+```
+Zobrazení počtu planet podle ery objevení a metody detekce.
+```python
+# zobrazení počtu planet podle roku objevu a metody detekce
+df = con.execute("""
+    SELECT
+        de.discovery_era,
+        dm.detection_method,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    JOIN dim_detection_method dm ON e.detection_method_id = dm.detection_method_id
+    GROUP BY de.discovery_era, dm.detection_method
+    ORDER BY num_planets DESC
+    """).df()
+print(df)
+```
+
+Tyto výsledky se dají i uložit do parquet souboru.
+# výsledky si zase můžeme uložit do parquet souboru
+```python
+makedirs('results', exist_ok=True)
+con.execute("""
+    COPY (
+        SELECT
+        de.discovery_era,
+        dm.detection_method,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    JOIN dim_detection_method dm ON e.detection_method_id = dm.detection_method_id
+    GROUP BY de.discovery_era, dm.detection_method
+    ORDER BY num_planets DESC
+    ) TO 'results/enriched_results.parquet' (FORMAT 'parquet')
 """)
 ```
 ### Ukázky grafů a srovnání
