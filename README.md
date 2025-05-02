@@ -118,6 +118,7 @@ con.execute("""
     FROM exoplanets
     WHERE mass_multiplier IS NOT NULL;
 """)
+# dim_distance_category
 con.execute("""
     CREATE TABLE dim_distance_category AS
     SELECT distance,
