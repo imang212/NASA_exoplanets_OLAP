@@ -73,7 +73,7 @@ print(con.execute("""
 Vytvořím 9 dimenzionálních tabulek. 
 - dim_planet_type, která obsahuje typy planet. 
 - dim_detection_method, která obsahuje metody detekce planety.
-- dim_stellar_type, která obsahuje vzdálenosti planet od hvězdy a její velikost hvězdy.
+- dim_stellar_type, která obsahuje kategorie o zářivosti hvězdy dané planety podle jeí vzdálenosti od hvězdy very bright, Bright, Moderate, Dim a Very dim.
 - dim_mass_category, která obsahuje hmotnosti planet rozdělené do kategorií Very Low Mass, Low Mass, Medium Mass a High Mass.
 - dim_distance_category, která obsahuje vzdálenosti planet rozdělených do kategorií Very Close (<10 ly), Close (<100 Ly), Medium (< 1000 ly) a far (>1000 ly).
 - dim_orbit_category, která obsahuje planety rozdělené do kategorií podle toho, jak daleko obíhají od své hvězdy Very Short, Short, Moderate a Long.
@@ -99,10 +99,21 @@ con.execute("""
 """)
 # dim_stellar_type
 con.execute("""
-    CREATE TABLE dim_star AS
-    SELECT DISTINCT distance, stellar_magnitude
-    FROM exoplanets
-    WHERE distance IS NOT NULL AND stellar_magnitude IS NOT NULL;
+    CREATE TABLE dim_stellar_type AS
+    SELECT
+        ROW_NUMBER() OVER () AS stellar_type_id, distance, stellar_magnitude,
+        CASE
+            WHEN stellar_magnitude < 0 THEN 'very bright'
+            WHEN stellar_magnitude BETWEEN 0 AND 2 THEN 'bright'
+            WHEN stellar_magnitude BETWEEN 2 AND 5 THEN 'moderate'
+            WHEN stellar_magnitude BETWEEN 5 AND 10 THEN 'dim'
+            ELSE 'very dim'
+        END AS brightness_category
+    FROM (
+        SELECT DISTINCT distance, stellar_magnitude,
+        FROM exoplanets
+        WHERE distance IS NOT NULL AND stellar_magnitude IS NOT NULL
+    );
 """)
 # dim_radius_category
 con.execute("""
@@ -185,5 +196,25 @@ con.execute("""
 ```
 
 ### Vytvoření Lakehouse storage
+Vytvořené tabulky si uložíme Parquet(Lake) souborů, kde se nám vytvoří soubory pro Lakehouse úložiště. Všechny je uložím do nově vytvořené složky "dimensions".
+```python
+# vytvoření složky pro dimenze
+import os
+os.makedirs('dimensions', exist_ok=True)
+# lakehouse storage
+con.execute("""
+    COPY exoplanets TO 'exoplanets.parquet' (FORMAT 'parquet');
+    COPY dim_planet_type TO 'dimensions/dim_planet_type.parquet' (FORMAT 'parquet');
+    COPY dim_detection_method TO 'dimensions/dim_detection_method.parquet' (FORMAT 'parquet');
+    COPY dim_stellar_type TO 'dimensions/dim_stellar_type.parquet' (FORMAT 'parquet');
+    COPY dim_mass_category TO 'dimensions/dim_mass_category.parquet' (FORMAT 'parquet');
+    COPY dim_distance_category TO 'dimensions/dim_distance_category.parquet' (FORMAT 'parquet');
+    COPY dim_orbit_category TO 'dimensions/dim_orbit_category.parquet' (FORMAT 'parquet');
+    COPY dim_brightness_category TO 'dimensions/dim_brightness_category.parquet' (FORMAT 'parquet');
+    COPY dim_discovery_era TO 'dimensions/dim_discovery_era.parquet' (FORMAT 'parquet');
+    COPY dim_date TO 'dimensions/dim_date.parquet' (FORMAT 'parquet');
+""")
+```
 
-### Ukázka grafů a porovnání
+
+### Ukázky grafů a srovnání
