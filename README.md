@@ -1,4 +1,4 @@
-# NASA Exoplanets Data Lakehouse
+# NASA Exoplanets OLAP
 
 ### Výběr databáze
 V této seminární práci budu pracovat z daty z vládního NASA archivu exoplanet.: https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS&constraint=default_flag%20%3E0
