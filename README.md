@@ -71,13 +71,16 @@ print(con.execute("""
 
 ### Vytvoření dimenzionálních tabulek
 Vytvořím 9 dimenzionálních tabulek. 
-- Tabulku dim_planet_type, která obsahuje typy planet. 
-- Tabulku dim_detection_method, která obsahuje metody detekce planety.
-- Tabulku dim_stellar_type, která obsahuje velikosti hvězd podle vzdáleností planet.
-- Tabulku dim_mass_category, která obsahuje hmotnosti hvězd rozdělené do kategorií.
-- Tabulku dim_distance_category, která obsahuje vzdálenosti planet rozdělených do kategorií
-
-
+- dim_planet_type, která obsahuje typy planet. 
+- dim_detection_method, která obsahuje metody detekce planety.
+- dim_stellar_type, která obsahuje vzdálenosti planet od hvězdy a její velikost hvězdy.
+- dim_mass_category, která obsahuje hmotnosti planet rozdělené do kategorií Very Low Mass, Low Mass, Medium Mass a High Mass.
+- dim_distance_category, která obsahuje vzdálenosti planet rozdělených do kategorií Very Close (<10 ly), Close (<100 Ly), Medium (< 1000 ly) a far (>1000 ly).
+- dim_orbit_category, která obsahuje planety rozdělené do kategorií podle toho, jak daleko obíhají od své hvězdy Very Short, Short, Moderate a Long.
+- dim_brightness_category, která obsahuje planety rozdělené do kategorií podle jejich jasu Very Bright, Bright, Dim, Very Dim.
+- dim_discovery_era, která obsahuje planety rozdělené do kategorií podle toho v jaké éře byli objeveny <2000, Early 21st Century, Kepler Era a
+Modern Era
+- dim_date, která obsahuje datumy zveřejnění planet, celé datum z tabulky rozdělené na rok, měsíc, den, název měsíce a název dnu.
 ```python
 ## vytvoření dim tabulek
 # dim_planet_type
@@ -116,7 +119,7 @@ con.execute("""
     WHERE mass_multiplier IS NOT NULL;
 """)
 con.execute("""
-    
+    CREATE TABLE dim_distance_category AS
     SELECT distance,
       CASE
         WHEN distance < 10 THEN 'Very Close (<10 ly)'
@@ -129,7 +132,7 @@ con.execute("""
 """)
 # dim_orbit_category
 con.execute("""
-CREATE TABLE dim_orbit_class AS
+    CREATE TABLE dim_orbit_category AS
     SELECT orbital_period,
         CASE
             WHEN orbital_period < 10 THEN 'Very Short'
@@ -142,6 +145,7 @@ CREATE TABLE dim_orbit_class AS
 """)
 # dim_brightness_category
 con.execute("""
+    CREATE TABLE dim_brightness_category AS
     SELECT stellar_magnitude,
       CASE
         WHEN stellar_magnitude < 5 THEN 'Very Bright'
@@ -154,6 +158,7 @@ con.execute("""
 """)
 # dim_discovery_era
 con.execute("""
+    CREATE TABLE dim_discovery_era AS
     SELECT discovery_year,
       CASE
         WHEN discovery_year < 2000 THEN '<2000'
