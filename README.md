@@ -283,6 +283,24 @@ con.execute("""
 ```
 
 ### Práce s Lakehouse databází
+```python
+import duckdb
+import pandas as pd
+import os
 
+con = duckdb.connect()
 
+con.execute("""
+    CREATE VIEW dim_planet_type AS SELECT * FROM 'dimensions/dim_planet_type.parquet';
+    CREATE VIEW dim_detection_method AS SELECT * FROM 'dimensions/dim_detection_method.parquet';
+    CREATE VIEW dim_stellar_type AS SELECT * FROM 'dimensions/dim_stellar_type.parquet';
+    CREATE VIEW dim_mass_category AS SELECT * FROM 'dimensions/dim_mass_category.parquet';
+    CREATE VIEW dim_distance_category AS SELECT * FROM 'dimensions/dim_distance_category.parquet';
+    CREATE VIEW dim_orbit_category AS SELECT * FROM 'dimensions/dim_orbit_category.parquet';
+    CREATE VIEW dim_brightness_category AS SELECT * FROM 'dimensions/dim_brightness_category.parquet';
+    CREATE VIEW dim_discovery_era AS SELECT * FROM 'dimensions/dim_discovery_era.parquet';
+    CREATE VIEW dim_date AS SELECT * FROM 'dimensions/dim_date.parquet';
+    CREATE VIEW exoplanets AS SELECT * FROM 'exoplanets.parquet';
+""")
+```
 ### Ukázky grafů a srovnání
