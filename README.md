@@ -42,8 +42,6 @@ con.execute("""
         LEFT JOIN read_csv_auto("PS_2025.04.28_06.13.44.csv") n ON LOWER(e.name) = LOWER(n.pl_name)
     """)
 ```
-### ERD diagram
-
 
 ### Zobrazení tabulek
 Zobrazíme si tabulku.:
@@ -53,10 +51,17 @@ con.table("exoplanets").show()
 Nová tabulka vypadá takhle.:
 ![image](https://github.com/user-attachments/assets/920b67f9-b038-4d97-8f65-49c39bf062d1)
 
-Můžem si zobrazit popis sloupců v tabulce.:
+Zobrazíme si popis sloupců v tabulce.:
 ```python
 print(con.execute("DESCRIBE exoplanets").fetchdf())
 ```
+![image](https://github.com/user-attachments/assets/fbb71914-e868-45d5-a7bd-59d4e1951605)
+
+#### ERD diagram
+Nejdřív si uděláme ERD diagram, abychom měli přehled o proměnných v tabulce.
+![Untitled](https://github.com/user-attachments/assets/541b854c-744b-47c9-84bc-b29abcfbb388)
+
+Takhle prozatím vypadá má tabulka.
 
 ### Query vyhledávání
 Vyzkoušíme query dotaz nad nově vytvořenou tabulkou.
@@ -85,23 +90,28 @@ Modern Era
 ## vytvoření dim tabulek
 # dim_planet_type
 con.execute("""
-    CREATE TABLE dim_planet_type AS
-    SELECT DISTINCT planet_type
-    FROM exoplanets
-    WHERE planet_type IS NOT NULL;
+    CREATE OR REPLACE TABLE dim_planet_type AS
+    SELECT ROW_NUMBER() OVER () AS planet_type_id, planet_type
+    FROM (
+        SELECT DISTINCT planet_type
+        FROM exoplanets
+        WHERE planet_type IS NOT NULL
+    ) t;
 """)
 # dim_detection_method
 con.execute("""
-    CREATE TABLE dim_detection_method AS
-    SELECT DISTINCT  detection_method
-    FROM exoplanets
-    WHERE detection_method IS NOT NULL;
+    CREATE OR REPLACE TABLE dim_detection_method AS
+    SELECT ROW_NUMBER() OVER () AS detection_method_id, detection_method
+    FROM (
+        SELECT DISTINCT detection_method
+        FROM exoplanets
+        WHERE detection_method IS NOT NULL
+    ) t;
 """)
 # dim_stellar_type
 con.execute("""
-    CREATE TABLE dim_stellar_type AS
-    SELECT
-        ROW_NUMBER() OVER () AS stellar_type_id, distance, stellar_magnitude,
+    CREATE OR REPLACE TABLE dim_stellar_type AS
+    SELECT ROW_NUMBER() OVER () AS stellar_type_id, distance, stellar_magnitude,
         CASE
             WHEN stellar_magnitude < 0 THEN 'very bright'
             WHEN stellar_magnitude BETWEEN 0 AND 2 THEN 'bright'
@@ -110,15 +120,15 @@ con.execute("""
             ELSE 'very dim'
         END AS brightness_category
     FROM (
-        SELECT DISTINCT distance, stellar_magnitude,
+        SELECT DISTINCT distance, stellar_magnitude
         FROM exoplanets
         WHERE distance IS NOT NULL AND stellar_magnitude IS NOT NULL
-    );
+    ) t;
 """)
-# dim_radius_category
+# dim_mass_category
 con.execute("""
-    CREATE TABLE dim_mass_category AS
-    SELECT mass_multiplier,
+    CREATE OR REPLACE TABLE dim_mass_category AS
+    SELECT ROW_NUMBER() OVER () AS mass_category_id, mass_multiplier,
         CASE
             WHEN mass_multiplier < 0.1 THEN 'Very Low Mass'
             WHEN mass_multiplier < 1 THEN 'Low Mass'
@@ -126,74 +136,126 @@ con.execute("""
             WHEN mass_multiplier < 20 THEN 'High Mass'
             ELSE 'Very High Mass'
         END AS mass_category
-    FROM exoplanets
-    WHERE mass_multiplier IS NOT NULL;
+    FROM (
+        SELECT DISTINCT mass_multiplier,
+        FROM exoplanets
+        WHERE mass_multiplier IS NOT NULL
+    ) t;
 """)
 # dim_distance_category
 con.execute("""
-    CREATE TABLE dim_distance_category AS
-    SELECT distance,
+    CREATE OR REPLACE TABLE dim_distance_category AS
+    SELECT ROW_NUMBER() OVER () AS distance_category_id, distance,
       CASE
         WHEN distance < 10 THEN 'Very Close (<10 ly)'
         WHEN distance < 100 THEN 'Close (<100 ly)'
         WHEN distance < 1000 THEN 'Medium (<1000 ly)'
         ELSE 'Far (>1000 ly)'
       END AS distance_category
-    FROM exoplanets
-    WHERE distance IS NOT NULL;
+    FROM (
+        SELECT DISTINCT distance,
+        FROM exoplanets
+        WHERE distance IS NOT NULL
+    ) t;
 """)
 # dim_orbit_category
 con.execute("""
-    CREATE TABLE dim_orbit_category AS
-    SELECT orbital_period,
+    CREATE OR REPLACE TABLE dim_orbit_category AS
+    SELECT ROW_NUMBER() OVER () AS orbit_category_id, orbital_period,
         CASE
             WHEN orbital_period < 10 THEN 'Very Short'
             WHEN orbital_period < 100 THEN 'Short'
             WHEN orbital_period < 1000 THEN 'Moderate'
             ELSE 'Long'
         END AS period_class
-    FROM exoplanets
-    WHERE orbital_period IS NOT NULL;
+    FROM (
+        SELECT DISTINCT orbital_period,
+        FROM exoplanets
+        WHERE orbital_period IS NOT NULL
+    ) t;
 """)
 # dim_brightness_category
 con.execute("""
-    CREATE TABLE dim_brightness_category AS
-    SELECT stellar_magnitude,
+    CREATE OR REPLACE TABLE dim_brightness_category AS
+    SELECT ROW_NUMBER() OVER () AS brightness_category_id, stellar_magnitude,
       CASE
         WHEN stellar_magnitude < 5 THEN 'Very Bright'
         WHEN stellar_magnitude < 10 THEN 'Bright'
         WHEN stellar_magnitude < 15 THEN 'Dim'
         ELSE 'Very Dim'
       END AS brightness_category
-    FROM exoplanets
-    WHERE stellar_magnitude IS NOT NULL;
+    FROM (
+        SELECT DISTINCT stellar_magnitude,
+        FROM exoplanets
+        WHERE stellar_magnitude IS NOT NULL
+    ) t;
 """)
 # dim_discovery_era
 con.execute("""
-    CREATE TABLE dim_discovery_era AS
-    SELECT discovery_year,
+    CREATE OR REPLACE TABLE dim_discovery_era AS
+    SELECT ROW_NUMBER() OVER () AS discovery_era_id, discovery_year,
       CASE
         WHEN discovery_year < 2000 THEN '<2000'
         WHEN discovery_year < 2010 THEN 'Early 21st Century'
         WHEN discovery_year < 2020 THEN 'Kepler Era'
         ELSE 'Modern Era'
       END AS discovery_era
-    FROM exoplanets;
+    FROM (
+        SELECT DISTINCT discovery_year
+        FROM exoplanets
+        WHERE discovery_year IS NOT NULL
+    ) t;
 """)
 # dim_date
 con.execute("""
-    CREATE TABLE dim_date AS
-    SELECT DISTINCT
+    CREATE OR REPLACE TABLE dim_date AS
+    SELECT
+        ROW_NUMBER() OVER () AS date_id,
         CAST(releasedate AS DATE) AS date,
         date_part('year', CAST(releasedate AS DATE)) AS year,
         date_part('month', CAST(releasedate AS DATE)) AS month,
         strftime(CAST(releasedate AS DATE), '%B') AS month_name,
         date_part('day', CAST(releasedate AS DATE)) AS day,
         strftime(CAST(releasedate AS DATE), '%A') AS weekday_name
-    FROM exoplanets
-    WHERE releasedate IS NOT NULL;
+    FROM (
+        SELECT DISTINCT releasedate
+        FROM exoplanets
+        WHERE releasedate IS NOT NULL
+    ) t;
 """)
 ```
+
+Nyní musíme propojit dimenzionální tabulky s naší tabulkou exoplanet tím, že vytvoříme vytvoříme v tabulce exoplanet id ke každé dimenzionální tabulce.
+```python
+# propojení dimenzionálních tabulek s tabulkou exoplanet
+con.execute("""
+    CREATE OR REPLACE TABLE exoplanets AS
+    SELECT e.*,
+        p.planet_type_id,
+        d.detection_method_id,
+        s.stellar_type_id,
+        m.mass_category_id,
+        dc.distance_category_id,
+        o.orbit_category_id,
+        b.brightness_category_id,
+        de.discovery_era_id,
+        dt.date_id
+    FROM exoplanets e
+    LEFT JOIN dim_planet_type p ON e.planet_type = p.planet_type
+    LEFT JOIN dim_detection_method d ON e.detection_method = d.detection_method
+    LEFT JOIN dim_stellar_type s ON e.distance = s.distance AND e.stellar_magnitude = s.stellar_magnitude
+    LEFT JOIN dim_mass_category m ON e.mass_multiplier = m.mass_multiplier
+    LEFT JOIN dim_distance_category dc ON e.distance = dc.distance
+    LEFT JOIN dim_orbit_category o ON e.orbital_period = o.orbital_period
+    LEFT JOIN dim_brightness_category b ON e.stellar_magnitude = b.stellar_magnitude
+    LEFT JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    LEFT JOIN dim_date dt ON CAST(e.releasedate AS DATE) = dt.date;
+""")
+```
+
+#### Výsledný ERD s dimenzionálními tabulkami
+![Untitled (1)](https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad)
+
 
 ### Vytvoření Lakehouse storage
 Vytvořené tabulky si uložíme Parquet(Lake) souborů, kde se nám vytvoří soubory pro Lakehouse úložiště. Všechny je uložím do nově vytvořené složky "dimensions".
@@ -215,6 +277,8 @@ con.execute("""
     COPY dim_date TO 'dimensions/dim_date.parquet' (FORMAT 'parquet');
 """)
 ```
+
+### Práce s Lakehouse databází
 
 
 ### Ukázky grafů a srovnání
