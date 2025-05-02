@@ -5,7 +5,9 @@ V této seminární práci budu pracovat z daty z vládního NASA archivu exopla
 V tomto archivu je uloženo kolem 38 000 těles celkově, z toho je asi přibližně 5 800 těles již potvrzených exoplanet. Z této stránky jsem stáhnul část tabulky obsahují všechny objevené exoplanety a informace o nich včetně datumu publikace v csv formátu. + zkombinuji již s jednou tabulkou od Aditya Mishra ML v csv formátu, která také obsahuje informace ze NASA archivu s lepším popisem: https://www.kaggle.com/datasets/adityamishraml/nasaexoplanets.
 
 ### Výběr databázového systému
-Pro vytvoření DLH systému jsem si vybral DuckDB databázový systém (https://duckdb.org/), který umožňuje vytvářet dimenze dat a datová jezera s daty. Tento databázový systém zároveň umožňuje práci v Pythonu. 
+Pro vytvoření DLH systému jsem si vybral DuckDB databázový systém (https://duckdb.org/), který umožňuje vytvářet dimenze dat a datová jezera s daty. Tento databázový systém zároveň umožňuje práci v Pythonu.
+
+Pro práci s databází nejdříve použijeme DLH_exoplanets_commit.py, přes který se nám vytvoří Warehouse databáze s hvězdicovým schématem a uložíme jí do Lakehouse storage a potom budem s DLH databází pracovat v souboru DLH_exoplanets_storages_use.py
 
 ### Nastavení DuckDB v python
 Nejdřív nainstalujeme potřebný moduly.
@@ -257,7 +259,7 @@ con.execute("""
 
 #### Výsledný ERD s dimenzionálními tabulkami
 ![Untitled (1)](https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad)
-Vytvořené ERD hvězdicové schéma.
+Vytvořené hvězdicové schéma.
 
 ### Vytvoření Lakehouse storage
 Vytvořené tabulky si uložíme Parquet(Lake) souborů, kde se nám vytvoří soubory pro Lakehouse úložiště. Všechny je uložím do nově vytvořené složky "dimensions".
