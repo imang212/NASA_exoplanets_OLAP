@@ -396,6 +396,10 @@ df = con.execute("""
 """).df()
 plt.figure(figsize=(14, 8))
 sns.lineplot(data=df, x='discovery_year', y='num_planets')
+plt.scatter(data=df, x='discovery_year', y="num_planets", color='red')
+for i, row in df.iterrows():
+    plt.text(row['discovery_year'], row['num_planets'] + 5, str(row['num_planets']),
+             ha='center', va='bottom', fontsize=14)
 plt.title("Počet objevených exoplanet podle roku")
 plt.xlabel("Rok objevu")
 plt.ylabel("Počet planet")
@@ -404,5 +408,5 @@ plt.tight_layout()
 plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
 plt.close()
 ```
+![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/90542917-b0c0-4dbb-8f6e-f8772b672589)
 
-![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/aab343a5-8938-4a34-8771-d2dc42b5a230)
