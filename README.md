@@ -494,4 +494,28 @@ plt.close()
 ![bar_plot_planet_type_distance](https://github.com/user-attachments/assets/916bda6c-c45f-45bf-9764-274ba0a46ec0)
 Z grafu vyplývá, že na typu objevené planety a její vzdálenosti vůběc nezáleží.
 
+```python
+df = con.execute("""
+    SELECT
+        dd.distance_category,
+        db.brightness_category,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_distance_category dd ON e.distance_category_id = dd.distance_category_id
+    JOIN dim_brightness_category db ON e.brightness_category_id = db.brightness_category_id
+    GROUP BY dd.distance_category, db.brightness_category
+    ORDER BY dd.distance_category
+""").df()
+df_pivot = df.pivot(index='distance_category', columns='brightness_category', values='num_planets').fillna(0)
+df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
+plt.title("Objevené exoplanety podle kategorie vzdálenosti a jejich jasu.")
+plt.xlabel("Vzdálenost")
+plt.ylabel("Počet exoplanet")
+plt.xticks(rotation=45)
+plt.legend(title='Jas', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.tight_layout()
+plt.savefig("graphs/bar_plot_planet_distance_brightness.png")
+plt.close()
+```
 
+![bar_plot_planet_type_distance](https://github.com/user-attachments/assets/92509d51-1d3d-4d52-a363-ff62187bf3da)
