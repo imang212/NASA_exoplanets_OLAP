@@ -409,6 +409,9 @@ plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
 plt.close()
 ```
 
-![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/ead10982-c851-4004-99ba-77d488f23f70)
+![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/232c9e31-9486-491d-998b-964ba34c606b)
+
+Graf ukazující typy exoplanet objevených v různých rocích.
+![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/4f8e3001-78d4-4619-b66e-31a1b861894b)
 
 
