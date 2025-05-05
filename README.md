@@ -518,4 +518,5 @@ plt.savefig("graphs/bar_plot_planet_distance_brightness.png")
 plt.close()
 ```
 
-![bar_plot_planet_type_distance](https://github.com/user-attachments/assets/92509d51-1d3d-4d52-a363-ff62187bf3da)
+![bar_plot_planet_distance_brightness](https://github.com/user-attachments/assets/f3b076ea-5454-4a5e-8585-923bba1a75cc)
+
