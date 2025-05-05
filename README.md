@@ -467,4 +467,31 @@ plt.close()
 ```
 ![bar_plot_detection_method_by_year](https://github.com/user-attachments/assets/fc9a14dc-fead-479f-94a7-41e527f3ab05)
 
+Objevené druhy planet podle vzdálenosti
+```python
+df = con.execute("""
+    SELECT
+        dd.distance_category,
+        e.planet_type,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_distance_category dd ON e.distance_category_id = dd.distance_category_id
+    GROUP BY e.planet_type, dd.distance_category
+    ORDER BY e.planet_type
+""").df()
+df_pivot = df.pivot(index='planet_type', columns='distance_category', values='num_planets').fillna(0)
+df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
+plt.title("Objevené exoplanety podle kategorie vzdálenosti a typu planety")
+plt.xlabel("Druh planety")
+plt.ylabel("Počet exoplanet")
+plt.xticks(rotation=45)
+plt.legend(title='kategorie vzdálenosti', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.tight_layout()
+plt.savefig("graphs/bar_plot_planet_type_distance.png")
+plt.close()
+```
+
+![bar_plot_planet_type_distance](https://github.com/user-attachments/assets/916bda6c-c45f-45bf-9764-274ba0a46ec0)
+Z grafu vyplývá, že na typu objevené planety a její vzdálenosti vůběc nezáleží.
+
 
