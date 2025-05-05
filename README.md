@@ -412,6 +412,7 @@ plt.close()
 ![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/232c9e31-9486-491d-998b-964ba34c606b)
 
 Graf ukazující typy exoplanet objevených v různých rocích.
-![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/4f8e3001-78d4-4619-b66e-31a1b861894b)
+![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/c1086906-35ed-447d-b6da-aec51ada5f92)
+
 
 
