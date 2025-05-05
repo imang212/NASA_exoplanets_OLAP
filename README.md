@@ -379,4 +379,26 @@ plt.savefig('graphs/exoplanet_era_detection_heatmap.png')
 plt.close()
 ```
 ![exoplanet_era_detection_heatmap](https://github.com/user-attachments/assets/26e56bf0-fb6e-4bc4-8fd3-77b3c758c388)
-
+```python
+import numpy as np
+#graf s časovou řadou poočtu exoplanet podle roku objevu
+df = con.execute("""
+    SELECT
+        de.discovery_year,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    JOIN dim_detection_method dm ON e.detection_method_id = dm.detection_method_id
+    GROUP BY de.discovery_year
+    ORDER BY de.discovery_year
+""").df()
+plt.figure(figsize=(14, 8))
+sns.lineplot(data=df, x='discovery_year', y='num_planets')
+plt.title("Počet objevených exoplanet podle roku")
+plt.xlabel("Rok objevu")
+plt.ylabel("Počet planet")
+plt.xticks(np.arange(1992, 2024, 1), rotation=45)
+plt.tight_layout()
+plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
+plt.close()
+```
