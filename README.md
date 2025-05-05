@@ -408,5 +408,7 @@ plt.tight_layout()
 plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
 plt.close()
 ```
-![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/90542917-b0c0-4dbb-8f6e-f8772b672589)
+
+![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/ead10982-c851-4004-99ba-77d488f23f70)
+
 
