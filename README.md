@@ -379,6 +379,8 @@ plt.savefig('graphs/exoplanet_era_detection_heatmap.png')
 plt.close()
 ```
 ![exoplanet_era_detection_heatmap](https://github.com/user-attachments/assets/26e56bf0-fb6e-4bc4-8fd3-77b3c758c388)
+
+Graf ukazující časovou řadu počtu objevených exoplanet podle roku.
 ```python
 import numpy as np
 #graf s časovou řadou poočtu exoplanet podle roku objevu
@@ -402,3 +404,5 @@ plt.tight_layout()
 plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
 plt.close()
 ```
+
+![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/aab343a5-8938-4a34-8771-d2dc42b5a230)
