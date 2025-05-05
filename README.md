@@ -412,7 +412,59 @@ plt.close()
 ![casova_rada_poctu_objevu_exoplanet](https://github.com/user-attachments/assets/232c9e31-9486-491d-998b-964ba34c606b)
 
 Graf ukazující typy exoplanet objevených v různých rocích.
+```python
+df = con.execute("""
+    SELECT
+        de.discovery_year,
+        e.planet_type,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    GROUP BY de.discovery_year, e.planet_type
+    ORDER BY de.discovery_year
+""").df()
+
+df_pivot = df.pivot(index='discovery_year', columns='planet_type', values='num_planets').fillna(0)
+
+df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
+
+plt.title("Objevené exoplanety podle typu a roku objevu")
+plt.xlabel("Rok objevu")
+plt.ylabel("Počet exoplanet")
+plt.xticks(rotation=45)
+plt.legend(title='Typ planety', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.tight_layout()
+plt.savefig("graphs/bar_plot_planet_type_by_year.png")
+plt.close()
+```
 ![bar_plot_planet_type_by_year](https://github.com/user-attachments/assets/c1086906-35ed-447d-b6da-aec51ada5f92)
 
+Graf ukazující typy detekcí objevených exoplanet v různých rocích.
+```python
+df = con.execute("""
+    SELECT
+        de.discovery_year,
+        dm.detection_method,
+        COUNT(*) AS num_planets
+    FROM exoplanets e
+    JOIN dim_discovery_era de ON e.discovery_year = de.discovery_year
+    JOIN dim_detection_method dm ON e.detection_method_id = dm.detection_method_id
+    GROUP BY de.discovery_year, dm.detection_method
+    ORDER BY de.discovery_year
+""").df()
+
+df_pivot = df.pivot(index='discovery_year', columns='detection_method', values='num_planets').fillna(0)
+df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
+
+plt.title("Objevené exoplanety podle metody detekce a roku objevu")
+plt.xlabel("Rok objevu")
+plt.ylabel("Počet exoplanet")
+plt.xticks(rotation=45)
+plt.legend(title='Metoda detekce', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.tight_layout()
+plt.savefig("graphs/bar_plot_detection_method_by_year.png")
+plt.close()
+```
+![bar_plot_detection_method_by_year](https://github.com/user-attachments/assets/fc9a14dc-fead-479f-94a7-41e527f3ab05)
 
 
