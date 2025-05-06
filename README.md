@@ -256,6 +256,11 @@ con.execute("""
     LEFT JOIN dim_date dt ON CAST(e.releasedate AS DATE) = dt.date;
 """)
 ```
+Zkontrolujem si jestli už se nám tabulky vytvořily.
+```python
+print(con.execute("SHOW TABLES").fetchdf()))
+```
+![image](https://github.com/user-attachments/assets/ebc300b9-feff-4c79-b8f7-2dd14c0ffcd5)
 
 #### Výsledný ERD s dimenzionálními tabulkami
 ![Untitled (1)](https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad)
