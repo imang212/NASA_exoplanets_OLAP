@@ -320,11 +320,6 @@ print(con.execute("""
 ```
 ![image](https://github.com/user-attachments/assets/97a16e4e-3fa0-4355-b13b-88ed5638b330)
 
-Pro kontrolu jestli se nám tabulky vytvořili si zobrazíme tabulky pomocí příkazu SHOW TABLES.
-```python
-print(con.execute("SHOW TABLES").fetchdf())
-```
-
 Spočítám si kolik v každé kategorii vzdálenosti je planet.
 ```python
 #zobrazení ketegorií a počtu planet v jednotlivých kategoriích
