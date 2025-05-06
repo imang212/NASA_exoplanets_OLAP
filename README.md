@@ -313,6 +313,13 @@ print(con.execute("""
         JOIN dim_distance_category dc ON e.distance_category_id = dc.distance_category_id
     """).df().head())
 ```
+![image](https://github.com/user-attachments/assets/97a16e4e-3fa0-4355-b13b-88ed5638b330)
+
+Pro kontrolu jestli se nám tabulky vytvořili si zobrazíme tabulky pomocí příkazu SHOW TABLES.
+```python
+print(con.execute("SHOW TABLES").fetchdf())
+```
+
 Spočítám si kolik v každé kategorii vzdálenosti je planet.
 ```python
 #zobrazení ketegorií a počtu planet v jednotlivých kategoriích
@@ -323,6 +330,8 @@ print(con.execute("""
         ORDER BY dc.distance_category
     """).df().head())
 ```
+![image](https://github.com/user-attachments/assets/4f75e6df-ef79-490b-90bf-7004c4d6ece0)
+
 Zobrazení počtu planet podle ery objevení a metody detekce.
 ```python
 # zobrazení počtu planet podle roku objevu a metody detekce
