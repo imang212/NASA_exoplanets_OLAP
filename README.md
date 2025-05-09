@@ -529,3 +529,40 @@ plt.close()
 
 ![bar_plot_planet_distance_brightness](https://github.com/user-attachments/assets/f3b076ea-5454-4a5e-8585-923bba1a75cc)
 
+```python
+con.execute("""
+    COPY (
+        SELECT
+            dp.planet_type,
+            oc.period_class,
+            COUNT(*) AS num_planets
+        FROM exoplanets e
+        JOIN dim_planet_type dp ON e.planet_type_id = dp.planet_type_id
+        JOIN dim_orbit_category oc ON e.orbit_category_id = oc.orbit_category_id
+        GROUP BY dp.planet_type, oc.period_class
+        ORDER BY dp.planet_type
+    ) TO 'results/exoplanet_planet_type_orbit_period_count.parquet' (FORMAT 'parquet')
+""")
+
+df = con.execute("""
+    SELECT * FROM 'results/exoplanet_planet_type_orbit_period_count.parquet';
+""").df()
+
+df_pivot = df.pivot(index='planet_type', columns='period_class', values='num_planets').fillna(0)
+
+plt.figure(figsize=(16, 9))
+df_pivot.plot(kind='bar', stacked=True, colormap='tab20', width=0.9)
+
+plt.title("Objevené exoplanety podle typu a délky orbitální periody")
+plt.xlabel("Typ planety")
+plt.ylabel("Počet exoplanet")
+plt.xticks(rotation=45)
+plt.legend(title='Kategorie orbitální periody', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.tight_layout()
+plt.savefig("graphs/bar_plot_planet_type_orbit_period.png")
+plt.close()
+```
+
+![bar_plot_planet_type_orbit_period](https://github.com/user-attachments/assets/a7c9d32b-44c7-42ec-836b-2f128d9c76a6)
+
+
