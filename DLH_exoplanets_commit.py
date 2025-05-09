@@ -195,13 +195,13 @@ con.execute("""
 print(con.execute("DESCRIBE exoplanets").fetchdf())
 
 
-#print(con.execute("""
-#    SELECT d.year, d.month_name, COUNT(*) AS planet_count
-#    FROM nasa_exoplanets e
-#    JOIN dim_date d ON CAST(e.release_date AS DATE) = d.date
-#    GROUP BY d.year, d.month_name
-#    ORDER BY d.year, d.month;
-#"""))
+print(con.execute("""
+    SELECT d.year, d.month_name, COUNT(*) AS planet_count
+    FROM nasa_exoplanets e
+    JOIN dim_date d ON CAST(e.release_date AS DATE) = d.date
+    GROUP BY d.year, d.month_name
+    ORDER BY d.year, d.month;
+"""))
 
 print(con.execute("SHOW TABLES").fetchdf())
 
