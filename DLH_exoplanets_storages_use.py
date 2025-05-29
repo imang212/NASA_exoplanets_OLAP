@@ -36,10 +36,9 @@ print(con.execute("""
         ORDER BY dc.distance_category
     """).df().head())
 
-
 # výsledky si zase můžeme uložit do parquet souboru
 makedirs('results', exist_ok=True)
-
+### zobrazení heatmapy počtu planet podle roku objevu a metody detekce
 con.execute("""
     COPY (
         SELECT
@@ -53,15 +52,12 @@ con.execute("""
     ORDER BY num_planets DESC
     ) TO 'results/planets_era_detection_method.parquet' (FORMAT 'parquet')
 """)
-
-# zobrazení počtu planet podle roku objevu a metody detekce
 df = con.execute("""SELECT * FROM 'results/planets_era_detection_method.parquet';""").df()
 #print(df)
-
+#vytvoření adresáře pro grafy
+makedirs('graphs', exist_ok=True)
 # Převod na kontingenční tabulku (pivot)
 pivot = df.pivot(index='detection_method', columns='discovery_era', values='num_planets')
-makedirs('graphs', exist_ok=True)
-
 # Heatmapa
 plt.figure(figsize=(14, 10))
 sns.heatmap(pivot, annot=True, fmt=".0f", cmap="coolwarm")
@@ -72,7 +68,7 @@ plt.tight_layout()
 plt.savefig('graphs/exoplanet_era_detection_heatmap.png')
 plt.close()
 
-#graf s časovou řadou poočtu exoplanet podle roku objevu
+###graf s časovou řadou počtu objevených exoplanet podle roku objevu
 con.execute("""
     COPY (
         SELECT
@@ -101,7 +97,7 @@ plt.tight_layout()
 plt.savefig('graphs/casova_rada_poctu_objevu_exoplanet.png')
 plt.close()
 
-
+### sloupcový graf s časovou řadou počtu exoplanet podle roku objevu a typu planety
 con.execute("""
     COPY (
         SELECT
@@ -130,6 +126,7 @@ plt.tight_layout()
 plt.savefig("graphs/bar_plot_planet_type_by_year.png")
 plt.close()
 
+###sloupcový graf s počtem exoplanet podle roku objevu a metody detekce
 con.execute("""
     COPY (
         SELECT
@@ -147,7 +144,6 @@ con.execute("""
 df = con.execute("""SELECT * FROM 'results/exoplanet_detection_method_count_by_year.parquet';""").df()
 #print(df)
 
-
 df_pivot = df.pivot(index='discovery_year', columns='detection_method', values='num_planets').fillna(0)
 df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
 plt.title("Objevené exoplanety podle metody detekce a roku objevu")
@@ -159,6 +155,7 @@ plt.tight_layout()
 plt.savefig("graphs/bar_plot_detection_method_by_year.png")
 plt.close()
 
+### slupcový graf s počtem exoplanet podle kategorie vzdálenosti a typu planety
 con.execute("""
     COPY (
         SELECT
@@ -174,6 +171,23 @@ con.execute("""
 
 df = con.execute("""SELECT * FROM 'results/exoplanet_distance_cat_type_count.parquet';""").df()
 #print(df)
+df_cor = con.execute("""WITH planet_type_num AS (
+    SELECT planet_type,
+    DENSE_RANK() OVER (ORDER BY planet_type) AS planet_type_id
+    FROM (SELECT DISTINCT planet_type
+        FROM exoplanets
+        WHERE planet_type IS NOT NULL)
+    ),
+    exoplanets_with_planet_type_ids AS (
+        SELECT e.distance, ptn.planet_type_id
+        FROM exoplanets e
+        JOIN planet_type_num ptn ON e.planet_type = ptn.planet_type
+        WHERE e.distance IS NOT NULL
+    )
+    SELECT CORR(planet_type_id, distance) AS corr_type_period
+    FROM exoplanets_with_planet_type_ids;
+""").df().to_string(index=False, header=False)
+print("Korelace mezi typem a vzdáleností: ", df_cor)
 
 df_pivot = df.pivot(index='planet_type', columns='distance_category', values='num_planets').fillna(0)
 df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
@@ -186,6 +200,7 @@ plt.tight_layout()
 plt.savefig("graphs/bar_plot_planet_type_distance.png")
 plt.close()
 
+### sluoupcový graf s počtem exoplanet podle kategorie vzdálenosti a světelnosti
 con.execute("""
     COPY (
         SELECT
@@ -199,10 +214,13 @@ con.execute("""
         ORDER BY dd.distance_category
     ) TO 'results/exoplanet_distance_cat_brightness_cat_count.parquet' (FORMAT 'parquet')
 """)
-
 df = con.execute("""SELECT * FROM 'results/exoplanet_distance_cat_brightness_cat_count.parquet';""").df()
-#print(df)
 
+df_cor = con.execute("""SELECT CORR(distance, stellar_magnitude) AS corr_bright_distance
+                        FROM exoplanets
+                        WHERE distance IS NOT NULL AND stellar_magnitude IS NOT NULL;
+                    """).df().to_string(index=False, header=False)
+print("Korelace mezi vzdálenostmi a jasností exoplanet: ", df_cor)
 
 df_pivot = df.pivot(index='distance_category', columns='brightness_category', values='num_planets').fillna(0)
 df_pivot.plot(kind='bar', stacked=True, colormap='tab20', figsize=(16, 9), width=0.9)
@@ -215,6 +233,7 @@ plt.tight_layout()
 plt.savefig("graphs/bar_plot_planet_distance_brightness.png")
 plt.close()
 
+### sloucový graf s počtem exoplanet podle typu planety a délky orbitální periody
 con.execute("""
     COPY (
         SELECT
@@ -232,9 +251,23 @@ con.execute("""
 df = con.execute("""
     SELECT * FROM 'results/exoplanet_planet_type_orbit_period_count.parquet';
 """).df()
+df_cor = con.execute("""WITH planet_type_num AS (
+                    SELECT planet_type,
+                    DENSE_RANK() OVER (ORDER BY planet_type) AS planet_type_id
+                    FROM (SELECT DISTINCT planet_type FROM exoplanets WHERE planet_type IS NOT NULL)
+                    ),
+                    exoplanets_mapped AS (
+                        SELECT e.orbital_period, ptn.planet_type_id
+                        FROM exoplanets e
+                        JOIN planet_type_num ptn ON e.planet_type = ptn.planet_type
+                        WHERE e.orbital_period IS NOT NULL
+                    )
+                    SELECT CORR(planet_type_id, orbital_period) AS corr_type_period
+                    FROM exoplanets_mapped;
+                    """).df().to_string(index=False, header=False)
+print("Korelace mezi typem a orbitální periodou exoplanet: ", df_cor)
 
 df_pivot = df.pivot(index='planet_type', columns='period_class', values='num_planets').fillna(0)
-
 plt.figure(figsize=(16, 9))
 df_pivot.plot(kind='bar', stacked=True, colormap='tab20', width=0.9)
 
