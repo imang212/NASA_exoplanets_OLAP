@@ -1,4 +1,13 @@
 # NASA Exoplanets OLAP
+Tento repozitář představuje implementaci Data Lakehouse (DLH) navrženou pro analýzu rozsáhlého archivu exoplanet agentury NASA. Za využití DuckDB pro vysoce výkonné analytické zpracování a Pythonu pro orchestraci dat transformuje tento projekt surová astronomická data do strukturovaného hvězdicového schématu (Star Schema), které je optimalizováno pro online analytické zpracování (OLAP).
+
+Projekt zkoumá vztahy mezi různými charakteristikami planet – jako jsou hmotnost, oběžná doba a éra objevu – pomocí pokročilého datového modelování a vizualizačních technik.
+
+**Použité technologie:**
+Databázový systém: DuckDB (In-process OLAP databáze)
+Formát úložiště: Apache Parquet
+Jazyk: Python 3.13
+Datové knihovny: Pandas, Seaborn, Matplotlib
 
 ### Výběr databáze
 V této seminární práci budu pracovat z daty z vládního NASA archivu exoplanet.: https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS&constraint=default_flag%20%3E0
