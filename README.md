@@ -1,29 +1,92 @@
-# NASA Exoplanets OLAP
-This repository presents a Data Lakehouse (DLH) implementation designed to analyze NASA's extensive exoplanet archive. By leveraging DuckDB for high-performance analytical processing and Python for data orchestration, this project transforms raw astronomical data into a structured Star Schema optimized for Online Analytical Processing (OLAP).
+[![Python: 3.13+](https://img.shields.io/badge/Python-3.13+-blue.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![DuckDB: 1.x](https://img.shields.io/badge/Database-DuckDB-FFF000.svg?style=flat-square&logo=duckdb&logoColor=black)](https://duckdb.org/)
+[![Storage: Parquet](https://img.shields.io/badge/Storage-Apache%20Parquet-00A6AF.svg?style=flat-square&logo=apache-parquet&logoColor=white)](https://parquet.apache.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
+# 🪐 NASA Exoplanets OLAP
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/26e56bf0-fb6e-4bc4-8fd3-77b3c758c388" width="800" alt="Exoplanet Heatmap Analysis">
+</p>
+
+This repository presents a **Data Lakehouse (DLH)** implementation designed to analyze NASA's extensive exoplanet archive. By leveraging **DuckDB** for high-performance analytical processing and Python for data orchestration, this project transforms raw astronomical data into a structured **Star Schema** optimized for Online Analytical Processing (OLAP).
+
+## Overview
 The project explores the relationship between various planetary characteristics—such as mass, orbital period, and discovery era—using advanced data modeling and visualization techniques.
 
-**Tech stack:**
-- Database Engine: DuckDB (In-process OLAP database)
-- Storage Format: Apache Parquet
-- Language: Python 3.13
-- Data Libraries: Pandas, Seaborn, Matplotlib
+### Core Features
+* **Hybrid Storage:** Combines raw CSV ingestion with structured Parquet (Lakehouse storage).
+* **High Performance:** Uses DuckDB for lightning-fast SQL queries on millions of rows.
+* **OLAP Star Schema:** Implements 9 dimensional tables for deep astronomical analysis.
+* **Data Visualization:** Comprehensive insights using Seaborn and Matplotlib.
 
-### Database Selection
-In this seminar paper, I will work with data from the official NASA Exoplanet Archive: [https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS&constraint=default_flag%20%3E0](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS&constraint=default_flag%20%3E0).
+## Tech stack
+| Component | Technology |
+| :--- | :--- |
+| **Engine** | [DuckDB](https://duckdb.org/) (In-process OLAP database) |
+| **Storage** | [Apache Parquet](https://parquet.apache.org/) |
+| **Language** | Python 3.13 |
+| **Libraries** | Pandas, Seaborn, Matplotlib |
 
-This archive contains around 38,000 objects in total, of which approximately 5,800 are already confirmed exoplanets. From this site, I downloaded a portion of the table containing all discovered exoplanets and information about them, including publication dates, in CSV format. I am combining this with a table from Aditya Mishra ML in CSV format, which also contains information from the NASA archive with better descriptions: [https://www.kaggle.com/datasets/adityamishraml/nasaexoplanets](https://www.kaggle.com/datasets/adityamishraml/nasaexoplanets).
+## Data Architecture
+The pipeline transforms raw data into a multi-dimensional star schema to answer complex questions about the universe.
 
-### Database System Selection
-To create the DLH (Data Lakehouse) system, I chose the DuckDB database system ([https://duckdb.org/](https://duckdb.org/)), which allows for the creation of data dimensions and data lakes. This database system also supports working in Python.
+### Star Schema Design
+We implement 9 dimensions including:
+* `dim_planet_type` - Categorization of planet compositions.
+* `dim_mass_category` - Mass-based grouping (Low to Very High).
+* `dim_discovery_era` - Temporal grouping (Pre-2000 to Modern Era).
+* `dim_distance_category` - Proximity-based classification (Light Years).
+* ...
 
-To work with the database, we first use `DLH_exoplanets_commit.py`, which creates a Warehouse database with a star schema and saves it to Lakehouse storage. Then, we work with the DLH database in the file `DLH_exoplanets_storages_use.py`.
+**Entity-Relationship Diagram (ERD):**
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad" width="850" alt="Final Star Schema ERD"/>
+</p>
 
-### Setting up DuckDB in Python
+### Quick start
+## Installation
 First, we install the necessary modules.
+```bash
+pip install duckdb pandas seaborn matplotlib
+```
 
-`pip install duckdb pandas`
+## Build the Warehouse
+Run the commitment script to create the database and export Parquet files:
+```bash
+python DLH_exoplanets_commit.py
+```
 
+## Analyze Data
+Use the storage script to perform OLAP queries and generate insights:
+```bash
+python DLH_exoplanets_storages_use.py
+```
+
+## Analytical Insights
+Our analysis reveals fascinating trends in exoplanetary discovery:
+
+#### Discovery Heatmap:
+A comparison of discovery eras versus detection methods shows the massive impact of the Kepler Era on transit detections.
+
+#### Temporal Trends:
+The following time series illustrates the exponential growth of confirmed exoplanets over the last three decades.
+
+## Project Structure
+```plaintext
+├── adityamishraml/          # Dataset source (Kaggle)
+├── dimensions/              # Lakehouse Parquet storage (Dimensions)
+├── graphs/                  # Generated visualization exports
+├── results/                 # Parquet exports of analytical results
+├── DLH_exoplanets_commit.py # Data Pipeline (Ingestion -> Warehouse -> Lake)
+└── DLH_exoplanets_use.py    # Analysis & Visualization layer
+```
+
+## Acknowledgement
+I worked with data from: 
+- **NASA Exoplanet Archive:** [Official Site](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS&constraint=default_flag%20%3E0).
+- **Aditya Mishra ML:** [Kaggle dataset](https://www.kaggle.com/datasets/adityamishraml/nasaexoplanets)
+
+## Setting up DuckDB in Python (step by step)
 Connect to the DuckDB database:
 ```python
 # import modules
