@@ -43,20 +43,20 @@ We implement 9 dimensions including:
   <img src="https://github.com/user-attachments/assets/88653550-f6c8-4dae-ae0e-0b37404e21ad" width="850" alt="Final Star Schema ERD"/>
 </p>
 
-### Quick start
-## Installation
+## Quick start
+### Installation
 First, we install the necessary modules.
 ```bash
 pip install duckdb pandas seaborn matplotlib
 ```
 
-## Build the Warehouse
+### Build the Warehouse
 Run the commitment script to create the database and export Parquet files:
 ```bash
 python DLH_exoplanets_commit.py
 ```
 
-## Analyze Data
+### Analyze Data
 Use the storage script to perform OLAP queries and generate insights:
 ```bash
 python DLH_exoplanets_storages_use.py
@@ -77,6 +77,7 @@ The following time series illustrates the exponential growth of confirmed exopla
 ├── dimensions/              # Lakehouse Parquet storage (Dimensions)
 ├── graphs/                  # Generated visualization exports
 ├── results/                 # Parquet exports of analytical results
+├── docs/                    # Documents for the repository
 ├── DLH_exoplanets_commit.py # Data Pipeline (Ingestion -> Warehouse -> Lake)
 └── DLH_exoplanets_use.py    # Analysis & Visualization layer
 ```
